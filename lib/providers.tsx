@@ -1,5 +1,7 @@
 "use client";
 
+import { Toaster } from "@/components/ui/sonner";
+import ClerkProvider from "./providers/clerk-provider";
 import { ThemeProvider } from "./providers/theme-provider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -10,7 +12,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      {children}
+      <ClerkProvider>
+        {children}
+        <Toaster richColors closeButton />
+      </ClerkProvider>
     </ThemeProvider>
   );
 }
