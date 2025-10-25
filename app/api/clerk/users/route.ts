@@ -1,9 +1,30 @@
-import { clerkClient } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Simple Clerk users admin route. Requires CLERK_SECRET_KEY in environment.
-
 export async function GET(req: Request) {
+  try {
+    const { userId } = await auth();
+    if (!userId)
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    const role =
+      (user as any)?.privateMetadata?.role ??
+      (user as any)?.private_metadata?.role ??
+      null;
+    if (!(role === "Admin" || role === "Staff")) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+      });
+    }
+  } catch (e: any) {
+    console.error("Auth error", e);
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
   try {
     const client = await clerkClient();
     // getUserList is the server-side method to list users

@@ -1,0 +1,18 @@
+{
+  "items": [
+    {
+      "id": "home",
+      "label": "Home",
+      "href": "/",
+      "order": 1,
+      "visible": true
+    },
+    {
+      "id": "about",
+      "label": "About",
+      "href": "/about",
+      "order": 2,
+      "visible": true
+    }
+  ]
+}

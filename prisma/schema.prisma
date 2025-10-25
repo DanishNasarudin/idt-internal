@@ -13,3 +13,16 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+// Navbar items for public navigation. Add this model and run `prisma migrate` to create the table.
+model NavbarItem {
+  id      String  @id @default(cuid())
+  label   String
+  href    String
+  order   Int
+  visible Boolean @default(true)
+  // Optional parent to allow nested dropdowns
+  parentId String?
+  parent   NavbarItem?  @relation("NavbarChildren", fields: [parentId], references: [id])
+  children NavbarItem[] @relation("NavbarChildren")
+}
