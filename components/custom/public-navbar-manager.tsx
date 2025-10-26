@@ -376,6 +376,7 @@ export default function PublicNavbarManager({
             <NavbarPreview items={visibleList} />
           </div>
         </div>
+        <div className="h-[200px]"></div>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
