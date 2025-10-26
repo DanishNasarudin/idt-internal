@@ -29,6 +29,7 @@ import {
 import { ArrowDown, ArrowUp, ChevronDown, Edit2, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { ScrollArea } from "../ui/scroll-area";
 
 type NavItem = {
   id: string;
@@ -260,107 +261,110 @@ export default function PublicNavbarManager({
 
       <div className="flex flex-col gap-4">
         <div className="border rounded-lg overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Label</TableHead>
-                <TableHead>Parent</TableHead>
-                <TableHead>URL</TableHead>
-                <TableHead className="text-center">Order</TableHead>
-                <TableHead className="text-center">Visible</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.length === 0 && !loading ? (
+          <div className="max-h-[500px] overflow-y-auto relative">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6}>
-                    <div className="py-6 text-center text-sm text-muted-foreground">
-                      No items
-                    </div>
-                  </TableCell>
+                  <TableHead>Label</TableHead>
+                  <TableHead>Parent</TableHead>
+                  <TableHead>URL</TableHead>
+                  <TableHead className="text-center">Order</TableHead>
+                  <TableHead className="text-center">Visible</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
-              ) : (
-                // render as nested rows using the tree builder
-                (() => {
-                  const tree = buildTree(items);
+              </TableHeader>
+              <TableBody>
+                {items.length === 0 && !loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6}>
+                      <div className="py-6 text-center text-sm text-muted-foreground">
+                        No items
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  // render as nested rows using the tree builder
+                  (() => {
+                    const tree = buildTree(items);
 
-                  const renderRows = (nodes: any[], depth = 0.5): any[] => {
-                    return nodes.flatMap((n) => {
-                      const row = (
-                        <TableRow key={n.id}>
-                          <TableCell
-                            style={{ paddingLeft: `${depth * 1.25}rem` }}
-                          >
-                            {n.label}
-                          </TableCell>
-                          <TableCell>
-                            {items.find((p) => p.id === n.parentId)?.label ??
-                              "-"}
-                          </TableCell>
-                          <TableCell className="max-w-xs truncate">
-                            {n.href}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {n.order}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Switch
-                              checked={Boolean(n.visible)}
-                              onCheckedChange={(v) =>
-                                toggleVisible(n.id, Boolean(v))
-                              }
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2 items-center justify-center">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => reorder(n.id, -1)}
-                                title="Move up"
-                              >
-                                <ArrowUp size={16} />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => reorder(n.id, 1)}
-                                title="Move down"
-                              >
-                                <ArrowDown size={16} />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => openEdit(n)}
-                                title="Edit"
-                              >
-                                <Edit2 size={16} />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => remove(n.id)}
-                                title="Delete"
-                              >
-                                <Trash2 size={16} />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
+                    const renderRows = (nodes: any[], depth = 0.5): any[] => {
+                      return nodes.flatMap((n) => {
+                        const row = (
+                          <TableRow key={n.id}>
+                            <TableCell
+                              style={{ paddingLeft: `${depth * 1.25}rem` }}
+                            >
+                              {n.label}
+                            </TableCell>
+                            <TableCell>
+                              {items.find((p) => p.id === n.parentId)?.label ??
+                                "-"}
+                            </TableCell>
+                            <TableCell className="max-w-xs truncate">
+                              {n.href}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              {n.order}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Switch
+                                checked={Boolean(n.visible)}
+                                onCheckedChange={(v) =>
+                                  toggleVisible(n.id, Boolean(v))
+                                }
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2 items-center justify-center">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => reorder(n.id, -1)}
+                                  title="Move up"
+                                >
+                                  <ArrowUp size={16} />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => reorder(n.id, 1)}
+                                  title="Move down"
+                                >
+                                  <ArrowDown size={16} />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => openEdit(n)}
+                                  title="Edit"
+                                >
+                                  <Edit2 size={16} />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => remove(n.id)}
+                                  title="Delete"
+                                >
+                                  <Trash2 size={16} />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
 
-                      if (!n.children || n.children.length === 0) return [row];
-                      return [row, ...renderRows(n.children, depth + 1)];
-                    });
-                  };
+                        if (!n.children || n.children.length === 0)
+                          return [row];
+                        return [row, ...renderRows(n.children, depth + 1)];
+                      });
+                    };
 
-                  return renderRows(tree);
-                })()
-              )}
-            </TableBody>
-          </Table>
+                    return renderRows(tree);
+                  })()
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
 
         <div className="border rounded-lg p-4">
@@ -397,25 +401,27 @@ export default function PublicNavbarManager({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem
-                  onSelect={() => setParentId(null)}
-                  variant={parentId === null ? "default" : "default"}
-                >
-                  -- none --
-                </DropdownMenuItem>
-                {items
-                  .filter((i) => i.id !== editItem?.id)
-                  .map((it) => (
-                    <DropdownMenuItem
-                      key={it.id}
-                      onSelect={() => setParentId(it.id)}
-                      disabled={
-                        descendantIds.has(it.id) || Boolean(it.parentId)
-                      }
-                    >
-                      {it.label}
-                    </DropdownMenuItem>
-                  ))}
+                <ScrollArea className="max-h-60">
+                  <DropdownMenuItem
+                    onSelect={() => setParentId(null)}
+                    variant={parentId === null ? "default" : "default"}
+                  >
+                    -- none --
+                  </DropdownMenuItem>
+                  {items
+                    .filter((i) => i.id !== editItem?.id)
+                    .map((it) => (
+                      <DropdownMenuItem
+                        key={it.id}
+                        onSelect={() => setParentId(it.id)}
+                        disabled={
+                          descendantIds.has(it.id) || Boolean(it.parentId)
+                        }
+                      >
+                        {it.label}
+                      </DropdownMenuItem>
+                    ))}
+                </ScrollArea>
               </DropdownMenuContent>
             </DropdownMenu>
             <div className="flex items-center gap-2 mt-2">
